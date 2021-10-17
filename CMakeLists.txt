@@ -5,4 +5,9 @@ project(simpleqm)
 if(USE_CONAN)
 	set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 endif()
-add_executable(simpleqm "src/main.cpp")
+file(GLOB SOURCES
+	src/quine-mccluskey.hpp
+	src/quine-mccluskey.cpp
+)
+list(APPEND SOURCES "src/main.cpp")
+add_executable(simpleqm ${SOURCES})
