@@ -1,11 +1,10 @@
+#include <string>
 #include <iostream>
 #include <map>
+#include <unordered_map>
 #include <vector>
-#include <string>
 #include <sstream>
 #include "stdint.h"
-
-using namespace std;
 
 /* algorithm 
 Inputs: Minterm numbers, num variables, optional don't cares
@@ -24,35 +23,35 @@ helper class:
 helper functions: 
 - calculate number of mismatching bits
 - count 1's in a number
+
+how to store data for first column of tabular method?
+-> vector of pairs
+    -> the index of each pair indicates the number of 1's in the corresponding list
+    -> pair: pair<bool, vector<int>>
+        fist bool indicates whether term is checked
+        second vector<int> is list of minterms
+
+how to store data for subsequent columns of tabular method?
+-> list of vector of pairs
+    -> entry[0]: bool (indicating checked/unchecked)
+    -> entry[1]: vector<int> (indicates which minterms make up this term)
+    -> each list separates sections of columns
 */
 
 
 
-map<std::string, int32_t> toInt;
-void mapMinterms(map<std::string, int32_t> m, const vector<std::string> minterms, const vector<std::string> dontcares = {})
+void mapMinterms(std::unordered_map<std::string, int32_t>& toInt, const std::vector<std::string>& minterms, const std::vector<std::string>& dontcares)
 {
     for (int8_t i = 0; i < minterms.size(); i++)
     {
-        m[minterms[i]] = stoi(minterms[i]);
+        toInt[minterms[i]] = std::stoi(minterms[i]);
     }
 
     for (int8_t i = 0; i < dontcares.size(); i++)
     {
-        m[dontcares[i]] = stoi(dontcares[i]);
+        toInt[dontcares[i]] = std::stoi(dontcares[i]);
     }
 }
-
-void sortMintermList(map<int8_t, vector<std::string>> mL, const vector<string> terms, const map<std::string, int32_t> termMap)
-{
-    for (int8_t i = 0; i < terms.size(); i++)
-    {
-        int8_t numOnes = countOnes(termMap[terms[i]]);
-        mL[numOnes].push_back(terms[i]);
-    }
-}
-
-
-vector<vector<int>> c1;
 
 int8_t countOnes(int32_t n)
 {
@@ -76,31 +75,51 @@ int8_t mismatchedBits(int32_t n1, int32_t n2)
     return res;
 }
 
-vector<std::string> getInput(std::string prompt)
+void getInput(int& numVariables, std::vector<std::string>& minterms, std::vector<std::string>& dontcares)
 {
-    std::string line;
-    std::string term;
-    vector<std::string> terms;
+    std::string line, term;
+    char isDontcares;
 
-    std::cout << prompt;
-    std::getLine(std::cin, line);
-    std::istringstream stream(line);
-    while (stream >> term)
+    std::cout << "Enter number of variables: ";
+    std::cin >> numVariables;
+    std::cin.ignore(); // clear cin buffer to prevent getline skipping
+
+    std::cout << "Enter minterms separated by spaces: ";
+    std::getline(std::cin, line);
+    std::stringstream mintermStream(line);
+    while (getline(mintermStream, term, ' '))
     {
-        terms.push_back(term);
+        minterms.push_back(term);
     }
-    return terms;
+
+    std::cout << "Do you wish to input dontcare terms (y/n)? ";
+    std::cin >> isDontcares;
+    std::cin.ignore();
+
+    if (isDontcares == 'y')
+    {
+        std::string line2, term2;
+        std::cout << "Enter dontcare terms separated by spaces: ";
+        std::getline(std::cin, line2);
+        std::stringstream dontcareStream(line2);
+        while (std::getline(dontcareStream, term2, ' '))
+        {
+            dontcares.push_back(term2);
+        }
+    }
 }
 
 int main()
 {
-    
-    vector<std::string> terms = getInput("Enter minterms here: ");
+    std::unordered_map<std::string, int32_t> toInt;
+    int numVariables = 0;
+    std::vector<std::string> dontcares = {};
+    std::vector<std::string> terms;
 
-    for (int i = 0; i < terms.size(); i++)
-    {
-        std::cout << terms[i] << std::endl;
-    }
+    getInput(numVariables, terms, dontcares);
+    mapMinterms(toInt, terms, dontcares);
+
+
 
     return 0;
 }
