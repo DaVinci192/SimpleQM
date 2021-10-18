@@ -23,13 +23,13 @@ namespace qm
 
     /// @brief Counts the number of ones in the binary form of n
     /// @param n the term value in binary form
-    /// @return Number of ones in the binary form of n
+    /// @return Returns the number of ones in the binary form of n
     int countOnes(std::string n);
 
     /// @brief Counts the number of mismatched bits/dashes between 2 numbers
     /// @param n1 first term in binary form
     /// @param n2 second term in binary form
-    /// @return number of mismatched bits/dashes between n1 and n2
+    /// @return Returns the number of mismatched bits/dashes between n1 and n2
     int mismatchedBits(std::string n1, std::string n2);
 
     /// @brief Returns a new string combining n1 and n2, replacing mismatching bits with a dash '-'
@@ -37,7 +37,23 @@ namespace qm
     /// @param n2 second term in binary form
     std::string combineWithDash(std::string n1, std::string n2);
 
-    
+    struct TabularEntry
+    {
+        std::string term;
+        bool isChecked;
+
+        TabularEntry(std::string s) : term(s), isChecked(false) {}
+    };
+
+    /// @brief Function to sort terms by number of ones (in binary form) into a table column
+    /// @param terms list of terms
+    /// @returns Returns a vector of vectors of entries
+    std::vector<std::vector<TabularEntry>> sortTermsByOnes(const std::unordered_map<std::string, std::string>& terms);
+
+    /// @brief Algorithm for finding prime implicants of logic expression
+    /// @param terms map minterms and their binary representation
+    /// @return Returns a list of prime implicants in their binary form
+    std::vector<std::string> findPrimeImplicants(const std::unordered_map<std::string, std::string>& terms);
 
 }
 

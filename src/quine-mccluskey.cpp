@@ -1,4 +1,5 @@
 #include "quine-mccluskey.hpp"
+#include <algorithm>
 
 void qm::getInput(int& numVariables, std::vector<std::string>& minterms, std::vector<std::string>& dontcares)
 {
@@ -102,6 +103,49 @@ std::string qm::combineWithDash(std::string n1, std::string n2)
             res.push_back(n1[i]);
     }
     return res;
+}
+
+std::vector<std::vector<qm::TabularEntry>> qm::sortTermsByOnes(const std::unordered_map<std::string, std::string>& terms)
+{
+    std::vector<std::vector<qm::TabularEntry>> res;
+    std::unordered_map<int, int> sortHelper;
+    
+    
+    for (auto i = terms.begin(); i != terms.end(); i++) // input each row into table
+    {
+        qm::TabularEntry entry = qm::TabularEntry(i->second);
+        int numOnes = qm::countOnes(entry.term);
+
+        if (sortHelper.find(numOnes) == sortHelper.end())
+        {
+            std::vector<qm::TabularEntry> firstTerm;
+            firstTerm.push_back(entry);
+            res.push_back(firstTerm);
+            sortHelper[numOnes] = res.size() - 1;
+        }
+        else
+        {
+            res[sortHelper[numOnes]].push_back(entry);
+        }
+    }
+
+    std::sort(res.begin(), res.end(), /* sort the rows by number of ones (in ascending order) */
+              [](const std::vector<qm::TabularEntry>& lhs, const std::vector<qm::TabularEntry>& rhs) ->
+              bool { return qm::countOnes(lhs[0].term) < qm::countOnes(rhs[0].term); });
+
+    return res;
+}
+
+std::vector<std::string> qm::findPrimeImplicants(const std::unordered_map<std::string, std::string>& terms)
+{
+    std::vector<std::vector<qm::TabularEntry>> c1 = qm::sortTermsByOnes(terms); ///< sorted list of terms by number of ones
+
+    
+
+    
+
+
+
 }
 
 

@@ -46,7 +46,9 @@ int main()
     qm::getInput(numVariables, minterms, dontcares);
     binary = qm::mapMintermsToBinary(minterms, dontcares, numVariables);
 
-    std::cout << qm::combineWithDash(binary["2"], binary["3"]) << std::endl;
+    std::vector<std::vector<qm::TabularEntry>> sorted = qm::sortTermsByOnes(binary);
+
+    std::cout << sorted[0][0].term << ", " << sorted[1][0].term << ": " << qm::mismatchedBits(sorted[0][0].term, sorted[1][0].term) << std::endl;
 
     return 0;
 }
