@@ -136,16 +136,67 @@ std::vector<std::vector<qm::TabularEntry>> qm::sortTermsByOnes(const std::unorde
     return res;
 }
 
-std::vector<std::string> qm::findPrimeImplicants(const std::unordered_map<std::string, std::string>& terms)
+std::vector<std::vector<qm::TabularEntry>> qm::generateNextColumn(std::vector<std::vector<TabularEntry>>& column)
 {
-    std::vector<std::vector<qm::TabularEntry>> c1 = qm::sortTermsByOnes(terms); ///< sorted list of terms by number of ones
+    /* Algorithm
+    - Compare each TabularEntry in each row with each TabularEntry in the subsequent row
+    - if mismatched bits == 1
+        -> both TabularEntry.checked = true
+        -> combineWithDash and append result to new row in res 
+    - else
+        -> move on 
+    return res
+    */
+   std::vector<std::vector<qm::TabularEntry>> res(column.size() - 1); // initialize res with (column.size()-1) rows
 
-    
+   for (int i = 0; i < column.size() - 1; i++) // iterate over each row, up until the second-to-last one
+   {
+       for (int j = 0; j < column[i].size(); j++) // iterate over each TableEntry in each row
+       {
+           TabularEntry *curr = &column[i][j];
+           for (int k = 0; k < column[i+1].size(); k++) // iterate over each TableEntry in the next row
+           {
+               TabularEntry *comp = &column[i+1][k];
+               if (mismatchedBits(curr->term, comp->term) == 1)
+               {
+                    curr->isChecked = true;
+                    comp->isChecked = true;
+                    
+                    TabularEntry tmp = TabularEntry(combineWithDash(curr->term, comp->term));
+                    res[i].push_back(tmp);
+               }
+           }
+       }
+   }
+   return res;
+}
 
-    
+std::set<std::string> qm::findPrimeImplicants(const std::unordered_map<std::string, std::string>& terms)
+{
+    std::set<std::string> res;
+    std::vector<std::vector<std::vector<qm::TabularEntry>>> table; ///< list of columns
+    std::vector<std::vector<qm::TabularEntry>> c0 = qm::sortTermsByOnes(terms); ///< sorted list of terms by number of ones
 
+    table.push_back(c0);
 
+    do
+    {
+        table.push_back(qm::generateNextColumn(table[table.size()-1]));
+    } while (table[table.size()-1].size() > 0);
 
+    for (int i = 0; i < table.size(); i++)
+    {
+        for (int j = 0; j < table[i].size(); j++)
+        {
+            for (int k = 0; k < table[i][j].size(); k++)
+            {
+                if (!table[i][j][k].isChecked)
+                    res.insert(table[i][j][k].term); // set takes care of dupliate terms
+            }
+        }
+    }
+
+    return res;
 }
 
 

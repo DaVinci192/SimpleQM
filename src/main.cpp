@@ -48,7 +48,12 @@ int main()
 
     std::vector<std::vector<qm::TabularEntry>> sorted = qm::sortTermsByOnes(binary);
 
-    std::cout << sorted[0][0].term << ", " << sorted[1][0].term << ": " << qm::mismatchedBits(sorted[0][0].term, sorted[1][0].term) << std::endl;
+    std::set<std::string> tmp = qm::findPrimeImplicants(binary);
+
+    for (auto pi : tmp)
+    {
+        std::cout << pi << std::endl;
+    }
 
     return 0;
 }

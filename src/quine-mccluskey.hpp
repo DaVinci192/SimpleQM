@@ -6,6 +6,7 @@
 #include <map>
 #include <unordered_map>
 #include <vector>
+#include <set>
 #include <sstream>
 
 namespace qm
@@ -48,12 +49,14 @@ namespace qm
     /// @brief Function to sort terms by number of ones (in binary form) into a table column
     /// @param terms list of terms
     /// @returns Returns a vector of vectors of entries
-    std::vector<std::vector<TabularEntry>> sortTermsByOnes(const std::unordered_map<std::string, std::string>& terms);
+    std::vector<std::vector<qm::TabularEntry>> sortTermsByOnes(const std::unordered_map<std::string, std::string>& terms);
+
+    std::vector<std::vector<qm::TabularEntry>> generateNextColumn(std::vector<std::vector<TabularEntry>>& column);
 
     /// @brief Algorithm for finding prime implicants of logic expression
     /// @param terms map minterms and their binary representation
     /// @return Returns a list of prime implicants in their binary form
-    std::vector<std::string> findPrimeImplicants(const std::unordered_map<std::string, std::string>& terms);
+    std::set<std::string> findPrimeImplicants(const std::unordered_map<std::string, std::string>& terms);
 
 }
 
