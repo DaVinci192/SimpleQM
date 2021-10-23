@@ -49,14 +49,40 @@ namespace qm
     /// @brief Function to sort terms by number of ones (in binary form) into a table column
     /// @param terms list of terms
     /// @returns Returns a vector of vectors of entries
-    std::vector<std::vector<qm::TabularEntry>> sortTermsByOnes(const std::unordered_map<std::string, std::string>& terms);
+    std::vector<std::vector<qm::TabularEntry>> sortTermsByOnes(std::unordered_map<std::string, std::string>& terms);
 
     std::vector<std::vector<qm::TabularEntry>> generateNextColumn(std::vector<std::vector<TabularEntry>>& column);
 
     /// @brief Algorithm for finding prime implicants of logic expression
     /// @param terms map minterms and their binary representation
     /// @return Returns a list of prime implicants in their binary form
-    std::set<std::string> findPrimeImplicants(const std::unordered_map<std::string, std::string>& terms);
+    std::set<std::string> findPrimeImplicants(std::unordered_map<std::string, std::string>& terms);
+
+    /// @brief Function to check whether given minterm is covered by the prime implicant
+    /// @return Returns true if the minterm is covered by the prime implicant, false otherwise
+    bool isCovered(const std::string& primeImplicant, const std::string& minterm);
+
+    /// @brief Creates a Prime Implicant Table, each entry refers to a minterm
+    std::vector<std::vector<int>> createPrimeImplicantMap(const std::set<std::string>& minterms, 
+                                                          const std::vector<std::string>& primeImplicants, 
+                                                          std::unordered_map<std::string, std::string>& binary);
+
+
+    struct PrimeImplicantTable
+    {
+        std::vector<std::vector<int>> table;
+        int rows = 0;
+        int cols = 0;
+
+        PrimeImplicantTable(std::vector<std::vector<int>> t0, int rows0, int cols0) : table(t0), rows(rows0), cols(cols0) {};
+
+    };
+
+    void qm::printPrimeImplicantTable(const std::vector<std::vector<int>> table, const std::vector<std::string> minterms);
+
+    /// @brief A naive implementation of Knuth's Algorithm X
+    std::vector<std::vector<int>> findExactCover(std::vector<std::vector<int>>& table, std::vector<std::vector<int>>& res);
+    
 
 }
 

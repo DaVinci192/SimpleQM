@@ -1,5 +1,6 @@
 #include "quine-mccluskey.hpp"
 #include <algorithm>
+#include <iomanip>
 
 void qm::getInput(int& numVariables, std::vector<std::string>& minterms, std::vector<std::string>& dontcares)
 {
@@ -105,7 +106,7 @@ std::string qm::combineWithDash(std::string n1, std::string n2)
     return res;
 }
 
-std::vector<std::vector<qm::TabularEntry>> qm::sortTermsByOnes(const std::unordered_map<std::string, std::string>& terms)
+std::vector<std::vector<qm::TabularEntry>> qm::sortTermsByOnes(std::unordered_map<std::string, std::string>& terms)
 {
     std::vector<std::vector<qm::TabularEntry>> res;
     std::unordered_map<int, int> sortHelper;
@@ -171,7 +172,7 @@ std::vector<std::vector<qm::TabularEntry>> qm::generateNextColumn(std::vector<st
    return res;
 }
 
-std::set<std::string> qm::findPrimeImplicants(const std::unordered_map<std::string, std::string>& terms)
+std::set<std::string> qm::findPrimeImplicants(std::unordered_map<std::string, std::string>& terms)
 {
     std::set<std::string> res;
     std::vector<std::vector<std::vector<qm::TabularEntry>>> table; ///< list of columns
@@ -199,4 +200,60 @@ std::set<std::string> qm::findPrimeImplicants(const std::unordered_map<std::stri
     return res;
 }
 
+bool qm::isCovered(const std::string& primeImplicant, const std::string& minterm)
+{
+    for (int i = 0; i < primeImplicant.size(); i++)
+    {
+        if ((primeImplicant[i] != '-') && (primeImplicant[i] != minterm[i]))
+            return false;
+    }
+    return true;
+}
+
+std::vector<std::vector<int>> qm::createPrimeImplicantMap(const std::set<std::string>& primeImplicants, 
+                                                          const std::vector<std::string>& minterms, 
+                                                          std::unordered_map<std::string, std::string>& binaryMap)
+{
+    std::vector<std::vector<int>> res;
+
+    for (int i = 0; i < minterms.size(); i++)
+    {
+        std::vector<int> tmp;
+        for (std::set<std::string>::iterator j = primeImplicants.begin(); j != primeImplicants.end(); j++)
+        {
+            (qm::isCovered(*j, binaryMap[minterms[i]])) ? tmp.push_back(1) : tmp.push_back(0);
+        }
+        res.push_back(tmp);
+    }
+    return res;
+}
+
+void qm::printPrimeImplicantTable(const std::vector<std::vector<int>> table, const std::vector<std::string> minterms)
+{
+    for (int i = 0; i < table.size(); i++)
+    {
+        std::cout << std::setw(2);
+        std::cout << minterms[i] << " ";
+    }
+    std::cout << std::endl;
+
+
+    for (int j = 0; j < table[0].size(); j++)
+    {
+        for (int i = 0; i < table.size(); i++)
+        {
+            std::cout << std::setw(2);
+            std::cout << table[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+std::vector<std::vector<int>> qm::findExactCover(std::vector<std::vector<int>>& table, std::vector<std::vector<int>>& res)
+{
+    if (table.size() == 0)
+        return table;
+
+    
+}
 

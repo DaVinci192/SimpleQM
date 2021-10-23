@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <iomanip>
 #include "quine-mccluskey.hpp"
 
 /* algorithm 
@@ -49,12 +49,20 @@ int main()
     std::vector<std::vector<qm::TabularEntry>> sorted = qm::sortTermsByOnes(binary);
 
     std::set<std::string> tmp = qm::findPrimeImplicants(binary);
+    std::vector<std::vector<int>> piTable = qm::createPrimeImplicantMap(tmp, minterms, binary);
+    qm:: printPrimeImplicantTable(piTable, minterms);
 
-    for (auto pi : tmp)
+    /*
+    for (int i = 0; i < minterms.size(); i++)
     {
-        std::cout << pi << std::endl;
-    }
+        std::cout << minterms[i] << ": ";
+        for (int j = 0; j < piTable[i].size(); j++)
+        {
+            std::cout << piTable[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }*/
 
-    return 0;
+    
 }
 
