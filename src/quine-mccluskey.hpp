@@ -76,9 +76,33 @@ namespace qm
 
         PrimeImplicantTable(std::vector<std::vector<int>> t0, int rows0, int cols0) : table(t0), rows(rows0), cols(cols0) {};
 
+        void removeColumn(int col)
+        {
+            table.erase(table.begin() + col);
+        }
+
+        void removeRow(int row)
+        {
+            for (int i = 0; i < cols; i++)
+            {
+                table[i].erase(table[i].begin() + row);
+            }
+        }
+
+        int sumCol(int col)
+        {
+            int res = 0;
+            for (int i = 1; i < rows; i++)
+            {
+                res += table[col][i];
+            }
+            return res;
+        }
     };
 
-    void qm::printPrimeImplicantTable(const std::vector<std::vector<int>> table, const std::vector<std::string> minterms);
+    /*
+    void printPrimeImplicantTable(const std::vector<std::vector<int>> table, const std::vector<std::string> minterms);
+    */
 
     /// @brief A naive implementation of Knuth's Algorithm X
     std::vector<std::vector<int>> findExactCover(std::vector<std::vector<int>>& table, std::vector<std::vector<int>>& res);

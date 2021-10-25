@@ -223,11 +223,21 @@ std::vector<std::vector<int>> qm::createPrimeImplicantMap(const std::set<std::st
         {
             (qm::isCovered(*j, binaryMap[minterms[i]])) ? tmp.push_back(1) : tmp.push_back(0);
         }
+        tmp.push_back(std::stoi(minterms[i]));
         res.push_back(tmp);
     }
+
+    std::vector<int> tmp;
+    for (int i = 0; i < primeImplicants.size(); i++)
+    {
+        tmp.push_back(i);
+    }
+    res.push_back(tmp);
+
     return res;
 }
 
+/*
 void qm::printPrimeImplicantTable(const std::vector<std::vector<int>> table, const std::vector<std::string> minterms)
 {
     for (int i = 0; i < table.size(); i++)
@@ -256,4 +266,4 @@ std::vector<std::vector<int>> qm::findExactCover(std::vector<std::vector<int>>& 
 
     
 }
-
+*/
