@@ -306,7 +306,7 @@ void qm::printMinterms(const std::set<std::string>& primeImplicants, const std::
             if (res[indices[i]][j] != '-')
             {
                 std::cout << char(int('A') + j);
-                if (res[indices[i]][j] != '0')
+                if (res[indices[i]][j] == '0')
                     std::cout << '\'';
             }
         }

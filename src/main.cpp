@@ -50,10 +50,11 @@ int main()
 
     std::set<std::string> tmp = qm::findPrimeImplicants(binary);
     qm::PrimeImplicantTable piTable = qm::createPrimeImplicantTable(tmp, minterms, binary);
-    
-    std::vector<int> res;
 
     
+
+    std::vector<int> res;
+
     for (int i = 0; i < piTable.table.size() - 1; i++)
     {
         std::vector<int> tmpRes;
