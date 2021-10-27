@@ -8,6 +8,7 @@
 #include <vector>
 #include <set>
 #include <sstream>
+#include <iomanip>
 
 namespace qm
 {
@@ -62,51 +63,137 @@ namespace qm
     /// @return Returns true if the minterm is covered by the prime implicant, false otherwise
     bool isCovered(const std::string& primeImplicant, const std::string& minterm);
 
+    struct PrimeImplicantTable
+        {
+            std::vector<std::vector<int>> table;
+            int rows = 0;
+            int cols = 0;
+
+            PrimeImplicantTable(std::vector<std::vector<int>> t0, int rows0, int cols0) : table(t0), rows(rows0), cols(cols0) {};
+
+            PrimeImplicantTable(const PrimeImplicantTable& t1) {table = t1.table; rows = t1.rows; cols = t1.cols; }
+
+            void crossOutColumn(int col)
+            {
+                //table.erase(table.begin() + col);
+                table[col][table[col].size() - 1] = -1;
+                cols--;
+            }
+
+            void crossOutRow(int row)
+            {
+                /*
+                for (int i = 0; i < cols; i++)
+                {
+                    table[i].erase(table[i].begin() + row);
+                }*/
+                table[table.size() - 1][row] = -1;
+                rows--;
+            }
+
+            bool isCrossedOutRow(int row) const
+            {
+                if (table[table.size() -1][row] == -1)
+                    return true;
+
+                return false;
+            }
+
+            bool isCrossedOutCol(int col) const
+            {
+                if (table[col][table[col].size() - 1] == -1)
+                    return true;
+
+                return false;
+            }
+
+            int sumCol(int col) const
+            {
+                int res = 0;
+                for (int i = 0; i < table[col].size() - 1; i++)
+                {
+                    if (!isCrossedOutRow(i))
+                        res += table[col][i];
+                }
+                return res;
+            }
+
+            int findColLeastOnes() const
+            {
+                int least;
+                for (int i = 0; i < table.size(); i++)
+                {
+                    if (table[i][table[0].size() - 1] != -1)
+                    {
+                        least = i;
+                        i = table.size();
+                    }
+                }
+
+                for (int i = least; i < table.size() - 1; i++)
+                {
+                    if ((sumCol(least) > sumCol(i)) && !isCrossedOutCol(i))
+                        least = i;
+                }
+                return least;
+            }
+
+            int findOne(int col) const
+            {
+                for (int i = 0; i < table[col].size() - 1; i++)
+                {
+                    if (table[col][i] == 1 && !isCrossedOutRow(i))
+                        return i;
+                }
+
+                return -1;
+            }
+
+            int getMinterm(int row) const
+            {
+                return table[table.size() - 1][row];
+            }
+
+            std::vector<int> getRemainingMinterms() const
+            {
+                std::vector<int> res;
+                for (int i = 0; i < table[0].size() - 1; i++)
+                {
+                    int tmp = table[table.size() - 1][i];
+                    if (tmp != -1)
+                        res.push_back(tmp);
+                }
+                
+                return res;
+            }
+
+            void printTable()
+            {
+                for (int j = 0; j < table[0].size(); j++)
+                {
+                    for (int i = 0; i < table.size(); i++)
+                    {
+                        std::cout << std::setw(2);
+                        std::cout << table[i][j] << " ";
+                    }
+                    std::cout << std::endl;
+                }
+            }
+        };
+
     /// @brief Creates a Prime Implicant Table, each entry refers to a minterm
-    std::vector<std::vector<int>> createPrimeImplicantMap(const std::set<std::string>& minterms, 
+    PrimeImplicantTable createPrimeImplicantTable(const std::set<std::string>& minterms, 
                                                           const std::vector<std::string>& primeImplicants, 
                                                           std::unordered_map<std::string, std::string>& binary);
 
 
-    struct PrimeImplicantTable
-    {
-        std::vector<std::vector<int>> table;
-        int rows = 0;
-        int cols = 0;
 
-        PrimeImplicantTable(std::vector<std::vector<int>> t0, int rows0, int cols0) : table(t0), rows(rows0), cols(cols0) {};
-
-        void removeColumn(int col)
-        {
-            table.erase(table.begin() + col);
-        }
-
-        void removeRow(int row)
-        {
-            for (int i = 0; i < cols; i++)
-            {
-                table[i].erase(table[i].begin() + row);
-            }
-        }
-
-        int sumCol(int col)
-        {
-            int res = 0;
-            for (int i = 1; i < rows; i++)
-            {
-                res += table[col][i];
-            }
-            return res;
-        }
-    };
-
-    /*
-    void printPrimeImplicantTable(const std::vector<std::vector<int>> table, const std::vector<std::string> minterms);
-    */
 
     /// @brief A naive implementation of Knuth's Algorithm X
-    std::vector<std::vector<int>> findExactCover(std::vector<std::vector<int>>& table, std::vector<std::vector<int>>& res);
+    PrimeImplicantTable findExactCover(PrimeImplicantTable& table, std::vector<int>& res, int seedCol = -1);
     
+    void printMintermsRaw(const std::set<std::string>& primeImplicants, const std::vector<int>& indices);
+    void printMinterms(const std::set<std::string>& primeImplicants, const std::vector<int>& indices);
 
 }
 

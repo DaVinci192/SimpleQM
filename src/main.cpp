@@ -49,20 +49,26 @@ int main()
     std::vector<std::vector<qm::TabularEntry>> sorted = qm::sortTermsByOnes(binary);
 
     std::set<std::string> tmp = qm::findPrimeImplicants(binary);
-    std::vector<std::vector<int>> piTable = qm::createPrimeImplicantMap(tmp, minterms, binary);
-    qm:: printPrimeImplicantTable(piTable, minterms);
-
-    /*
-    for (int i = 0; i < minterms.size(); i++)
-    {
-        std::cout << minterms[i] << ": ";
-        for (int j = 0; j < piTable[i].size(); j++)
-        {
-            std::cout << piTable[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }*/
+    qm::PrimeImplicantTable piTable = qm::createPrimeImplicantTable(tmp, minterms, binary);
+    
+    std::vector<int> res;
 
     
+    for (int i = 0; i < piTable.table.size() - 1; i++)
+    {
+        std::vector<int> tmpRes;
+        qm::PrimeImplicantTable t0 = piTable;
+        qm::findExactCover(t0, tmpRes, i);
+
+        if (t0.cols == 0)
+        {
+            piTable = t0;
+            res = tmpRes;
+            i = piTable.table.size();
+        }
+    }
+    
+    qm::printMintermsRaw(tmp, res);
+    qm::printMinterms(tmp, res);
 }
 

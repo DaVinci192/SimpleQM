@@ -210,7 +210,7 @@ bool qm::isCovered(const std::string& primeImplicant, const std::string& minterm
     return true;
 }
 
-std::vector<std::vector<int>> qm::createPrimeImplicantMap(const std::set<std::string>& primeImplicants, 
+qm::PrimeImplicantTable qm::createPrimeImplicantTable(const std::set<std::string>& primeImplicants, 
                                                           const std::vector<std::string>& minterms, 
                                                           std::unordered_map<std::string, std::string>& binaryMap)
 {
@@ -227,43 +227,91 @@ std::vector<std::vector<int>> qm::createPrimeImplicantMap(const std::set<std::st
         res.push_back(tmp);
     }
 
-    std::vector<int> tmp;
+    std::vector<int> primeImplicantsInt;
     for (int i = 0; i < primeImplicants.size(); i++)
     {
-        tmp.push_back(i);
+        primeImplicantsInt.push_back(i);
     }
-    res.push_back(tmp);
+    primeImplicantsInt.push_back(-1);
+    res.push_back(primeImplicantsInt);
 
-    return res;
+    qm::PrimeImplicantTable t{res, int(primeImplicants.size()), int(minterms.size())};
+
+    return t;
 }
 
-/*
-void qm::printPrimeImplicantTable(const std::vector<std::vector<int>> table, const std::vector<std::string> minterms)
+
+qm::PrimeImplicantTable qm::findExactCover(qm::PrimeImplicantTable& piTable, std::vector<int>& res, int seedCol)
 {
-    for (int i = 0; i < table.size(); i++)
-    {
-        std::cout << std::setw(2);
-        std::cout << minterms[i] << " ";
-    }
-    std::cout << std::endl;
+    if (piTable.cols == 0)
+        return piTable;
+    
 
+    int col; 
 
-    for (int j = 0; j < table[0].size(); j++)
+    if (seedCol != -1)
+        col = seedCol;
+    else
+        col = piTable.findColLeastOnes(); 
+    
+    
+    if (piTable.sumCol(col) == 0 && !piTable.isCrossedOutCol(col))
+        return piTable;
+
+    int row = piTable.findOne(col);
+        
+    res.push_back(piTable.getMinterm(row));
+
+    for (int i = 0; i < piTable.table.size() - 1; i++) // iterate over cols
     {
-        for (int i = 0; i < table.size(); i++)
+        if (piTable.table[i][row] == 1 && !piTable.isCrossedOutCol(i))
         {
-            std::cout << std::setw(2);
-            std::cout << table[i][j] << " ";
+            piTable.crossOutColumn(i);
+        }
+    }
+    piTable.crossOutRow(row);
+
+    return qm::findExactCover(piTable, res);
+}
+
+void qm::printMintermsRaw(const std::set<std::string>& primeImplicants, const std::vector<int>& indices)
+{
+    std::vector<std::string> res;
+
+    for (const auto& implicant : primeImplicants)
+    {
+        res.push_back(implicant);
+    }
+
+    for (int i = 0; i < indices.size(); i++)
+    {
+        std::cout << res[indices[i]] << std::endl;
+    }
+}
+
+void qm::printMinterms(const std::set<std::string>& primeImplicants, const std::vector<int>& indices)
+{
+
+    std::vector<std::string> res;
+
+    for (const auto& implicant : primeImplicants)
+    {
+        res.push_back(implicant);
+    }
+
+    for (int i = 0; i < indices.size(); i++) // iterate over each prime implicant
+    {
+        for (int j = 0; j < res[indices[i]].size(); j++) // iterate over each character in string
+        {
+            if (res[indices[i]][j] != '-')
+            {
+                std::cout << char(int('A') + j);
+                if (res[indices[i]][j] != '0')
+                    std::cout << '\'';
+            }
         }
         std::cout << std::endl;
-    }
+    }   
+
 }
 
-std::vector<std::vector<int>> qm::findExactCover(std::vector<std::vector<int>>& table, std::vector<std::vector<int>>& res)
-{
-    if (table.size() == 0)
-        return table;
-
-    
-}
-*/
